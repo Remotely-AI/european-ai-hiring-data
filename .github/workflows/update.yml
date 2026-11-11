@@ -1,0 +1,39 @@
+name: Update data
+
+# Weekly rebuild from remotelyaijobs.com's public data files. A new data report gets its own
+# release, which Zenodo archives with a DOI. Commits are made by github-actions[bot].
+on:
+  schedule:
+    - cron: "0 7 * * 1" # Mondays 07:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - id: build
+        run: node scripts/build.mjs | tee build.log && echo "new=$(grep -oP 'NEW_REPORTS=\K.*' build.log)" >> "$GITHUB_OUTPUT" && rm build.log
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "No changes."; exit 0; fi
+          git commit -m "Update data $(date -u +%F)"
+          git push
+      - name: Release new reports
+        if: steps.build.outputs.new != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for slug in ${{ steps.build.outputs.new }}; do
+            title=$(head -1 "reports/$slug/README.md" | sed 's/^# //')
+            gh release create "$slug" --title "$title" --notes-file "reports/$slug/README.md"
+          done

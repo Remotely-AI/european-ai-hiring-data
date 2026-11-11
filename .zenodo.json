@@ -1,0 +1,9 @@
+{
+  "title": "European AI hiring data (Remotely AI)",
+  "upload_type": "dataset",
+  "description": "Open remote and hybrid AI roles in Europe and fortnightly hiring reports: new roles by category and country, top hiring companies, and skills gaining or losing share. Read every weekday from employers' own career sites by Remotely AI (remotelyaijobs.com).",
+  "creators": [{ "name": "Remotely AI" }],
+  "license": "cc-by-4.0",
+  "keywords": ["AI jobs", "Europe", "labour market", "hiring", "remote work", "job postings"],
+  "related_identifiers": [{ "identifier": "https://remotelyaijobs.com/", "relation": "isSupplementTo", "scheme": "url" }]
+}
